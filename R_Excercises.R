@@ -71,21 +71,51 @@ simulation <- function(t,beta0, beta1, variance, burn){
 
 y <- simulation(100,0,0.9,2,20)
 
-ar_estimation <- function(y, p, intercept){
-  y = y[-c[1:p]]
-  x = matrix(ncol = p)
-  for (i in p){
-    x[i] = y[]  
-  }
-}
+
 
 ####################### Problem 2 ##################################
+# Question A
 cov_matrix <- matrix(c(1,0.9,0.9,2), nrow=2, ncol=2)
 c <- matrix(c(0.1,-0.2), ncol = 1)
 A1 <- matrix(c(4/5,0,8/3,3/10), nrow=2, ncol=2)
 t <- 100
 burn <- 20
- 
 
-?ts
+K <- nrow(A1)
 
+mean_y <- solve(diag(2)-A1) %*% c
+
+set.seed(23456)
+e_matrix <- matrix(rnorm((t+burn)*K), ncol = K)
+y_matrix <- matrix(0, nrow = ,(t+burn), ncol = K)
+
+y_matrix[,1] = mean_y
+
+
+chol_sigma <- chol(cov_matrix)
+t(chol_sigma) %*% chol_sigma
+
+for (i in 2:(t+burn)){
+  y_matrix[i,] = c + A1 %*% y_matrix[(i-1),] + t(chol_sigma) %*% e_matrix[i,]
+}
+
+y_ts <- ts(y_matrix[-c(1:burn),], start =c(1990, 1), frequency=4)
+
+plot(y_ts)
+plot(y_ts, plot.type="single", col=c(1,3))
+
+
+# Question B
+eigenvalues <- eigen(A1)
+eigenvalues$values
+
+
+
+# Question C
+apply(y_matrix, 2, mean)
+mean_y
+
+
+####################################################################
+######################### Week 2 ###################################
+####################################################################
